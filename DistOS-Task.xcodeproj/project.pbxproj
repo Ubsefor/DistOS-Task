@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		474E3A522733FCBD0092EF7A /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 474E3A512733FCBD0092EF7A /* main.c */; };
+		474E3A5E2733FF300092EF7A /* libmpi.40.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 474E3A5A2733FD640092EF7A /* libmpi.40.dylib */; };
+		474E3A602733FF840092EF7A /* libmpi.40.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 474E3A5A2733FD640092EF7A /* libmpi.40.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -20,11 +22,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		474E3A5F2733FF300092EF7A /* Embed Libraries */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				474E3A5E2733FF300092EF7A /* libmpi.40.dylib in Embed Libraries */,
+			);
+			name = "Embed Libraries";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		474E3A4E2733FCBD0092EF7A /* DistOS-Task */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "DistOS-Task"; sourceTree = BUILT_PRODUCTS_DIR; };
 		474E3A512733FCBD0092EF7A /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		474E3A5A2733FD640092EF7A /* libmpi.40.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmpi.40.dylib; path = "../../../../../usr/local/Cellar/open-mpi/4.1.1_2/lib/libmpi.40.dylib"; sourceTree = "<group>"; };
+		474E3A612734008F0092EF7A /* DistOS-Task.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "DistOS-Task.entitlements"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +47,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				474E3A602733FF840092EF7A /* libmpi.40.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -43,6 +59,7 @@
 			children = (
 				474E3A502733FCBD0092EF7A /* DistOS-Task */,
 				474E3A4F2733FCBD0092EF7A /* Products */,
+				474E3A592733FD640092EF7A /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -57,9 +74,18 @@
 		474E3A502733FCBD0092EF7A /* DistOS-Task */ = {
 			isa = PBXGroup;
 			children = (
+				474E3A612734008F0092EF7A /* DistOS-Task.entitlements */,
 				474E3A512733FCBD0092EF7A /* main.c */,
 			);
 			path = "DistOS-Task";
+			sourceTree = "<group>";
+		};
+		474E3A592733FD640092EF7A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				474E3A5A2733FD640092EF7A /* libmpi.40.dylib */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -72,6 +98,7 @@
 				474E3A4A2733FCBD0092EF7A /* Sources */,
 				474E3A4B2733FCBD0092EF7A /* Frameworks */,
 				474E3A4C2733FCBD0092EF7A /* CopyFiles */,
+				474E3A5F2733FF300092EF7A /* Embed Libraries */,
 			);
 			buildRules = (
 			);
@@ -240,9 +267,20 @@
 		474E3A562733FCBD0092EF7A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "DistOS-Task/DistOS-Task.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 3CF49YC524;
 				ENABLE_HARDENED_RUNTIME = YES;
+				HEADER_SEARCH_PATHS = "/usr/local/opt/open-mpi/include";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/lib/openmpi,
+					/usr/local/opt/libevent/lib,
+					"/usr/local/Cellar/open-mpi/4.1.1_2/lib",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.1;
+				OTHER_CFLAGS = "-lmpi";
+				PRODUCT_BUNDLE_IDENTIFIER = com.distos.task;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -250,9 +288,20 @@
 		474E3A572733FCBD0092EF7A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "DistOS-Task/DistOS-Task.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 3CF49YC524;
 				ENABLE_HARDENED_RUNTIME = YES;
+				HEADER_SEARCH_PATHS = "/usr/local/opt/open-mpi/include";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/lib/openmpi,
+					/usr/local/opt/libevent/lib,
+					"/usr/local/Cellar/open-mpi/4.1.1_2/lib",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.1;
+				OTHER_CFLAGS = "-lmpi";
+				PRODUCT_BUNDLE_IDENTIFIER = com.distos.task;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
