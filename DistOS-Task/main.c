@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
     printf(
            "Hello world from processor %s, rank %d out of %d processors\n",
            processor_name, world_rank, world_size
-    );
+           );
 
     // Finalize the MPI environment.
     MPI_Finalize();
