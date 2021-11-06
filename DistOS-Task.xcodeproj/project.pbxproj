@@ -13,7 +13,7 @@
 
 /* Begin PBXFileReference section */
 		474E3A4E2733FCBD0092EF7A /* DistOS-Task */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "DistOS-Task"; sourceTree = BUILT_PRODUCTS_DIR; };
-		474E3A512733FCBD0092EF7A /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		474E3A512733FCBD0092EF7A /* main.c */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; tabWidth = 2; };
 		474E3A5A2733FD640092EF7A /* libmpi.40.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmpi.40.dylib; path = "../../../../../usr/local/Cellar/open-mpi/4.1.1_2/lib/libmpi.40.dylib"; sourceTree = "<group>"; };
 		474E3A612734008F0092EF7A /* DistOS-Task.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "DistOS-Task.entitlements"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -254,7 +254,7 @@
 					"/usr/local/Cellar/open-mpi/4.1.1_2/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.1;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "-DSIZE=5";
 				PRODUCT_BUNDLE_IDENTIFIER = com.distos.task;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -276,7 +276,7 @@
 					"/usr/local/Cellar/open-mpi/4.1.1_2/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.1;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "-DSIZE=5";
 				PRODUCT_BUNDLE_IDENTIFIER = com.distos.task;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

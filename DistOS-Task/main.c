@@ -6,32 +6,44 @@
 //
 
 #include <mpi.h>
+#include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
+
+#ifndef SIZE
+#define SIZE 5
+#endif
 
 int main(int argc, char** argv) {
-    
-    // Initialize the MPI environment
-    MPI_Init(NULL, NULL);
-
-    // Get the number of processes
-    int world_size;
-    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-
-    // Get the rank of the process
-    int world_rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
-
-    // Get the name of the processor
-    char processor_name[MPI_MAX_PROCESSOR_NAME];
-    int name_len;
-    MPI_Get_processor_name(processor_name, &name_len);
-
-    // Print off a hello world message
-    printf(
-           "Hello world from processor %s, rank %d out of %d processors\n",
-           processor_name, world_rank, world_size
-           );
-
-    // Finalize the MPI environment.
-    MPI_Finalize();
+  
+  // Initialize the MPI environment
+  MPI_Init(&argc, &argv);
+  
+  // Get the number of processes and ranks
+  int rank, tasks;
+  MPI_Comm port;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &tasks);
+  
+  // size of transputer matrix: 5*5
+  int size[2] = {5, 5};
+  int periodic[2] = {0};
+  
+  MPI_Cart_create(MPI_COMM_WORLD, 2, size, periodic, 0, &port);
+  int coords[2] = {0};
+  
+  // nanosleep for processes to init correctly (needed on my system for some reason)
+  struct timespec tim, tim2;
+  tim.tv_sec  = 0;
+  tim.tv_nsec = 5000000000L;
+  nanosleep(&tim, &tim2);
+  
+  MPI_Cart_coords(port, rank, 2, coords);
+  srand(rank + 4);
+  int a = rand() % 1000;
+  printf("Coords of process #%d: (%d, %d)\n", rank, coords[0], coords[1]);
+  printf("Elem: a[%d][%d] = %d\n", coords[0], coords[1], a);
+  
+  // Finalize the MPI environment.
+  MPI_Finalize();
 }
