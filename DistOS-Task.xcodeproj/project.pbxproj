@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		474E3A522733FCBD0092EF7A /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 474E3A512733FCBD0092EF7A /* main.c */; };
+		474E3A522733FCBD0092EF7A /* mpi.c in Sources */ = {isa = PBXBuildFile; fileRef = 474E3A512733FCBD0092EF7A /* mpi.c */; };
 		474E3A602733FF840092EF7A /* libmpi.40.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 474E3A5A2733FD640092EF7A /* libmpi.40.dylib */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		4728F5272736EB6C00FAA4C7 /* readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = readme.md; sourceTree = SOURCE_ROOT; };
 		474E3A4E2733FCBD0092EF7A /* DistOS-Task */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "DistOS-Task"; sourceTree = BUILT_PRODUCTS_DIR; };
-		474E3A512733FCBD0092EF7A /* main.c */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; tabWidth = 2; };
+		474E3A512733FCBD0092EF7A /* mpi.c */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.c.c; path = mpi.c; sourceTree = "<group>"; tabWidth = 2; };
 		474E3A5A2733FD640092EF7A /* libmpi.40.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmpi.40.dylib; path = "../../../../../usr/local/Cellar/open-mpi/4.1.1_2/lib/libmpi.40.dylib"; sourceTree = "<group>"; };
 		474E3A612734008F0092EF7A /* DistOS-Task.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "DistOS-Task.entitlements"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -52,7 +52,7 @@
 			isa = PBXGroup;
 			children = (
 				474E3A612734008F0092EF7A /* DistOS-Task.entitlements */,
-				474E3A512733FCBD0092EF7A /* main.c */,
+				474E3A512733FCBD0092EF7A /* mpi.c */,
 				4728F5272736EB6C00FAA4C7 /* readme.md */,
 			);
 			path = "DistOS-Task";
@@ -122,7 +122,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				474E3A522733FCBD0092EF7A /* main.c in Sources */,
+				474E3A522733FCBD0092EF7A /* mpi.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -256,7 +256,7 @@
 					"/usr/local/Cellar/open-mpi/4.1.1_2/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.1;
-				OTHER_CFLAGS = "-DSIZE=5";
+				OTHER_CFLAGS = "-DSIZE=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.distos.task;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -278,7 +278,7 @@
 					"/usr/local/Cellar/open-mpi/4.1.1_2/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.1;
-				OTHER_CFLAGS = "-DSIZE=5";
+				OTHER_CFLAGS = "-DSIZE=4";
 				PRODUCT_BUNDLE_IDENTIFIER = com.distos.task;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
