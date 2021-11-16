@@ -199,7 +199,7 @@ int main(int argc, char** argv) {
       
     case 1:
         // the red ones
-      SET_PAIR_COORDS(4, 2 );
+      SET_PAIR_COORDS(4, 2);
       MPI_RECEIVE();
       RES_CMP();
       break;
