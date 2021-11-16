@@ -47,9 +47,9 @@ int main(int argc, char** argv) {
   {
     if (rank == 0){
       printf("This application is meant to be run with %d processes.\nUse orterun -np 25 <executable file>", SIZE*SIZE);
+      MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
     }
     MPI_Barrier(MPI_COMM_WORLD);
-    MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
   }
   
   
