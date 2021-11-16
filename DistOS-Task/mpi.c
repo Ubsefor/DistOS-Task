@@ -9,10 +9,28 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <stdbool.h>
 
-#ifndef SIZE
-#define SIZE 4
-#endif
+#define SIZE 5
+
+#define SET_PAIR_COORDS(a,b) {\
+  paired_coords[0] = a;\
+  paired_coords[1] = b;\
+}
+
+#define MPI_RECEIVE() {\
+  MPI_Cart_rank(port, paired_coords, &paired_rank);\
+  MPI_Recv(&result, 1, MPI_INT, paired_rank, 0, port, &status);\
+}
+
+#define MPI_SEND() {\
+  MPI_Cart_rank(port, paired_coords, &paired_rank);\
+  MPI_Send(&stored_value, 1, MPI_INT, paired_rank, 0, port);\
+}
+
+#define RES_CMP() {\
+  if (result >= stored_value) stored_value = result;\
+}
 
 int main(int argc, char** argv) {
   
@@ -22,22 +40,32 @@ int main(int argc, char** argv) {
     // Get the number of processes and ranks
   int rank, tasks;
   MPI_Comm port;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &tasks);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  
+  if (tasks != SIZE*SIZE)
+  {
+    printf("This application is meant to be run with %d processes.\nUse orterun -np 25 <executable file>", SIZE*SIZE);
+    MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+  }
   
     // size of transputer matrix: 5*5
-  int size[2] = {SIZE, SIZE};
-  int periodic[2] = {1, 1};
-  int coords[2] = {0};
+  int size[2];
+  int periodic[2];
+  int coords[2];
+  
+  size[0] = size[1] = SIZE;
+  periodic[0] = periodic[1] = 1;
 
-  MPI_Cart_create(MPI_COMM_WORLD, 2, size, periodic, 0, &port);
+  MPI_Cart_create(MPI_COMM_WORLD, 2, size, periodic, 1, &port);
+  MPI_Barrier(port);
   MPI_Cart_coords(port, rank, 2, coords);
   
-  printf("Rank:%d – MPI Cart created of 2 dims, %d size", rank, size[1] * size[0]);
-  srand(rank + 4);
-  int stored_value = rand() % 1000;
-  printf("Coords of process #%d: (%d, %d)\n", rank, coords[0], coords[1]);
-  printf("Elem: a[%d][%d] = %d\n", coords[0], coords[1], stored_value);
+  printf("Rank: %2d – MPI Cart created of 2 dims, %2d size\n", rank, size[1] * size[0]);
+  // for debug
+  MPI_Barrier(port);
+  srand((unsigned) (time(NULL) + coords[0] + coords[1] + rank));
+  int stored_value = (rand() * coords[0] + coords[1]) % 1000 ;
   
     // storage and coordinates variables
   int result = 0;
@@ -45,170 +73,210 @@ int main(int argc, char** argv) {
   int paired_rank = 0;
   MPI_Status status = {0};
   
-    // Exchanging the values in 6 steps:
-    // Step 1:
-  paired_coords[1] = coords[1];
-  
-  if (coords[0] == 0 || coords[0] == 3) {
-    if (coords[0] == coords[0] + 1) {
-      paired_coords[0] = coords[0] + 1;
-      MPI_Cart_rank(port, paired_coords, &paired_rank);
-      printf("#1 MPI_Cart Successfull: (%d, %d)\n", coords[0], coords[1]);
-      MPI_Send(&stored_value, 1, MPI_INT, paired_rank, 0, port);
-    } else {
-      paired_coords[0] = coords[0] - 1;
-      MPI_Cart_rank(port, paired_coords, &paired_rank);
-      printf("#1 MPI_Cart Successfull: (%d, %d)\n", coords[0], coords[1]);
-      MPI_Send(&stored_value, 1, MPI_INT, paired_rank, 0, port);
-    }
-  } else {
-    if (coords[0] == 1) {
-      paired_coords[0] = coords[0] - 1;
-      MPI_Cart_rank(port, paired_coords, &paired_rank);
-      printf("#1 MPI_Cart Successfull: (%d, %d)\n", coords[0], coords[1]);
-      MPI_Recv(&result, 1, MPI_INT, paired_rank, 0, port, &status);
-    } else {
-      paired_coords[0] = coords[0] + 1;
-      MPI_Cart_rank(port, paired_coords, &paired_rank);
-      printf("#1 MPI_Cart Successfull: (%d, %d)\n", coords[0], coords[1]);
-      MPI_Recv(&result, 1, MPI_INT, paired_rank, 0, port, &status);
-    }
-    if (result > stored_value) {
-      stored_value = result;
-    }
-  }
-  
-  printf("#1: (%d, %d) finished\n", coords[0], coords[1]);
-  
   MPI_Barrier(port);
+  printf("(%d,%d): Init succ, rank: %2d, val: %3d\n", coords[0], coords[1], rank, stored_value);
   
-  if (coords[0] == 0 && coords[1] == 0){
-    printf("\n\n(0, 0): Step one succesfull!\n\n");
-  }
+    // Step 1
+  MPI_Barrier(port);
+  int switcher = coords[0] * 10 + coords[1];
   
-    // Step 2:
-  if (coords[0] == 2) {
-    paired_coords[0] = coords[0] - 1;
-    MPI_Cart_rank(port, paired_coords, &paired_rank);
-    MPI_Send(&stored_value, 1, MPI_INT, paired_rank, 0, port);
-  }
-  if (coords[0] == 1) {
-    paired_coords[0] = coords[0] + 1;
-    MPI_Cart_rank(port, paired_coords, &paired_rank);
-    MPI_Recv(&result, 1, MPI_INT, paired_rank, 0, port, &status);
+  switch(switcher){
     
-    if (result > stored_value) {
-      stored_value = result;
-    }
-  }
-  
-  MPI_Barrier(port);
-  
-  if (coords[0] == 0 && coords[1] == 0){
-    printf("\n\n(0, 0): Step two succesfull!\n\n");
-  }
-  
-    // Step 3:
-  if (coords[0] == 1 && (coords[1] == 0 || coords[1] == 3)) {
-    paired_coords[0] = coords[0];
-    if (coords[1] == 0) {
-      paired_coords[1] = coords[1] + 1;
-    } else {
-      paired_coords[1] = coords[1] - 1;
-    }
-    MPI_Cart_rank(port, paired_coords, &paired_rank);
-    MPI_Send(&stored_value, 1, MPI_INT, paired_rank, 0, port);
-  }
-  if (coords[0] == 1 && (coords[1] == 1 || coords[1] == 2)) {
-    paired_coords[0] = coords[0];
-    if (coords[1] == 1) {
-      paired_coords[1] = coords[1] - 1;
-    } else {
-      paired_coords[1] = coords[1] + 1;
-    }
-    MPI_Cart_rank(port, paired_coords, &paired_rank);
-    MPI_Recv(&result, 1, MPI_INT, paired_rank, 0, port, &status);
+    case 2:
+    case 4:
+      // the blue ones
+      SET_PAIR_COORDS(coords[0], coords[1] - 1);
+      MPI_SEND();
+      break;
     
-    if (result > stored_value) {
-      stored_value = result;
-    }
-  }
-  
-  MPI_Barrier(port);
-  
-  if (coords[0] == 0 && coords[1] == 0){
-    printf("\n\n(0, 0): Step three succesfull!\n\n");
-  }
-  
-    // Step 4:
-  if (coords[0] == 1 && coords[1] == 3) {
-    paired_coords[0] = coords[0];
-    paired_coords[1] = 1;
-    MPI_Cart_rank(port, paired_coords, &paired_rank);
-    MPI_Send(&stored_value, 1, MPI_INT, paired_rank, 0, port);
-  }
-  if (coords[0] == 1 && coords[1] == 1) {
-    paired_coords[0] = coords[0];
-    paired_coords[1] = 3;
-    MPI_Cart_rank(port, paired_coords, &paired_rank);
-    MPI_Recv(&result, 1, MPI_INT, paired_rank, 0, port, &status);
-    if (result > stored_value) {
-      stored_value = result;
-    }
-  }
-  
-  MPI_Barrier(port);
-  
-  if (coords[0] == 0 && coords[1] == 0){
-    printf("\n\n(0, 0): Step four succesfull!\n\n");
-  }
-  
-    // Step 5:
-  if (coords[0] == 1 && coords[1] == 1) {
-    paired_coords[0] = 0;
-    paired_coords[1] = 1;
-    MPI_Cart_rank(port, paired_coords, &paired_rank);
-    MPI_Send(&stored_value, 1, MPI_INT, paired_rank, 0, port);
-  }
-  if (coords[0] == 0 && coords[1] == 1) {
-    paired_coords[0] = 1;
-    paired_coords[1] = 1;
-    MPI_Cart_rank(port, paired_coords, &paired_rank);
-    MPI_Recv(&result, 1, MPI_INT, paired_rank, 0, port, &status);
+    case 1:
+    case 3:
+      // the red ones
+      SET_PAIR_COORDS(coords[0], coords[1] + 1);
+      MPI_RECEIVE();
+      RES_CMP();
+      break;
+      
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+    case 30:
+    case 31:
+    case 32:
+    case 33:
+    case 34:
+      // the yellow ones
+      SET_PAIR_COORDS(coords[0] + 1, coords[1]);
+      MPI_SEND();
+      break;
     
-    if (result > stored_value) {
-      stored_value = result;
-    }
+    case 20:
+    case 21:
+    case 22:
+    case 23:
+    case 24:
+    case 40:
+    case 41:
+    case 42:
+    case 43:
+    case 44:
+      // the green ones
+      SET_PAIR_COORDS(coords[0] - 1, coords[1]);
+      MPI_RECEIVE();
+      RES_CMP();
+      break;
+    
+    case 0:
+      // don't touch 0 0 yet
+      break;
+      
+    default:
+      // in case we happen to somehow get here – abort with error
+      MPI_Abort(port, MPI_ERR_TOPOLOGY);
+      break;
+  }
+  
+  // wait for everyone to exchange their values
+  MPI_Barrier(port);
+  
+  // Step 2
+  
+  switch(switcher){
+      
+    case 3:
+        // the blue ones
+      SET_PAIR_COORDS(coords[0], coords[1] - 2);
+      MPI_SEND();
+      break;
+      
+    case 1:
+        // the red ones
+      SET_PAIR_COORDS(coords[0], coords[1] + 2);
+      MPI_RECEIVE();
+      RES_CMP();
+      break;
+      
+    case 20:
+    case 21:
+    case 22:
+    case 23:
+    case 24:
+      // the yellow ones
+      SET_PAIR_COORDS(coords[0] + 2, coords[1]);
+      MPI_SEND();
+      break;
+      
+    
+    case 40:
+    case 41:
+    case 42:
+    case 43:
+    case 44:
+      // the green ones
+      SET_PAIR_COORDS(coords[0] - 2, coords[1]);
+      MPI_RECEIVE();
+      RES_CMP();
+      break;
+    
+    default:
+        // all other cases are done, MPI_Topology checked at step 1
+      break;
+  }
+  
+  MPI_Barrier(port);
+  
+  // Step 3
+  
+  switch(switcher){
+      
+    case 42:
+        // the blue ones
+      SET_PAIR_COORDS(0, 1);
+      MPI_SEND();
+      break;
+      
+    case 1:
+        // the red ones
+      SET_PAIR_COORDS(4, 2 );
+      MPI_RECEIVE();
+      RES_CMP();
+      break;
+      
+    case 43:
+    case 44:
+        // the yellow ones
+      SET_PAIR_COORDS(coords[0], coords[1] - 3);
+      MPI_SEND();
+      break;
+      
+      
+    case 40:
+    case 41:
+        // the green ones
+      SET_PAIR_COORDS(coords[0], coords[1] + 3);
+      MPI_RECEIVE();
+      RES_CMP();
+      break;
+      
+    default:
+        // all other cases are done, MPI_Topology checked at step 1
+      break;
+  }
+  
+  MPI_Barrier(port);
+  
+  // Step 4
+  
+  switch(switcher){
+    
+    case 1:
+    case 41:
+        // the yellow ones
+      SET_PAIR_COORDS(coords[0], coords[1] - 1);
+      MPI_SEND();
+      break;
+      
+    case 0:
+    case 40:
+        // the green ones
+      SET_PAIR_COORDS(coords[0], coords[1] + 1);
+      MPI_RECEIVE();
+      RES_CMP();
+      break;
+      
+    default:
+        // all other cases are done, MPI_Topology checked at step 1
+      break;
+  }
+  
+  MPI_Barrier(port);
+  
+  switch(switcher){
+      
+    case 40:
+        // the yellow ones
+      SET_PAIR_COORDS(coords[0] - 4, coords[1]);
+      MPI_SEND();
+      break;
+      
+    case 0:
+        // the green ones
+      SET_PAIR_COORDS(coords[0] + 4, coords[1]);
+      MPI_RECEIVE();
+      RES_CMP();
+      break;
+      
+    default:
+      // all other cases are done, MPI_Topology checked at step 1
+      break;
   }
   
   MPI_Barrier(port);
   
   if (coords[0] == 0 && coords[1] == 0){
-    printf("\n\n(0, 0): Step five succesfull!\n\n");
-  }
-  
-    // Step 6:
-  if (coords[0] == 0 && coords[1] == 1) {
-    paired_coords[0] = 0;
-    paired_coords[1] = 0;
-    MPI_Cart_rank(port, paired_coords, &paired_rank);
-    MPI_Send(&stored_value, 1, MPI_INT, paired_rank, 0, port);
-  }
-  if (coords[0] == 0 && coords[1] == 0) {
-    paired_coords[0] = 0;
-    paired_coords[1] = 1;
-    MPI_Cart_rank(port, paired_coords, &paired_rank);
-    MPI_Recv(&result, 1, MPI_INT, paired_rank, 0, port, &status);
-    if (result > stored_value) {
-      stored_value = result;
-    }
-  }
-  
-  MPI_Barrier(port);
-  
-  if (coords[0] == 0 && coords[1] == 0) {
-    printf("\n\n(0, 0): Step six succesfull!\n\n");
-    printf("MPI_Reduce'd max: %d\n", stored_value);
+    printf("(%d,%d): Received max value equalling to %d\n", coords[0], coords[1], stored_value);
   }
     // Finalize the MPI environment.
   MPI_Finalize();

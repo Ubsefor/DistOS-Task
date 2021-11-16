@@ -256,7 +256,7 @@
 					"/usr/local/Cellar/open-mpi/4.1.1_2/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.1;
-				OTHER_CFLAGS = "-DSIZE=4";
+				OTHER_CFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.distos.task;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -278,7 +278,7 @@
 					"/usr/local/Cellar/open-mpi/4.1.1_2/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.1;
-				OTHER_CFLAGS = "-DSIZE=4";
+				OTHER_CFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.distos.task;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
