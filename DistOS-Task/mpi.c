@@ -14,22 +14,22 @@
 #define SIZE 5
 
 #define SET_PAIR_COORDS(a,b) {\
-  paired_coords[0] = a;\
-  paired_coords[1] = b;\
+paired_coords[0] = a;\
+paired_coords[1] = b;\
 }
 
 #define MPI_RECEIVE() {\
-  MPI_Cart_rank(port, paired_coords, &paired_rank);\
-  MPI_Recv(&result, 1, MPI_INT, paired_rank, 0, port, &status);\
+MPI_Cart_rank(port, paired_coords, &paired_rank);\
+MPI_Recv(&result, 1, MPI_INT, paired_rank, 0, port, &status);\
 }
 
 #define MPI_SEND() {\
-  MPI_Cart_rank(port, paired_coords, &paired_rank);\
-  MPI_Send(&stored_value, 1, MPI_INT, paired_rank, 0, port);\
+MPI_Cart_rank(port, paired_coords, &paired_rank);\
+MPI_Send(&stored_value, 1, MPI_INT, paired_rank, 0, port);\
 }
 
 #define RES_CMP() {\
-  if (result >= stored_value) stored_value = result;\
+if (result >= stored_value) stored_value = result;\
 }
 
 int main(int argc, char** argv) {
@@ -45,9 +45,13 @@ int main(int argc, char** argv) {
   
   if (tasks != SIZE*SIZE)
   {
-    printf("This application is meant to be run with %d processes.\nUse orterun -np 25 <executable file>", SIZE*SIZE);
+    if (rank == 0){
+      printf("This application is meant to be run with %d processes.\nUse orterun -np 25 <executable file>", SIZE*SIZE);
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
   }
+  
   
     // size of transputer matrix: 5*5
   int size[2];
@@ -56,13 +60,13 @@ int main(int argc, char** argv) {
   
   size[0] = size[1] = SIZE;
   periodic[0] = periodic[1] = 1;
-
+  
   MPI_Cart_create(MPI_COMM_WORLD, 2, size, periodic, 1, &port);
   MPI_Barrier(port);
   MPI_Cart_coords(port, rank, 2, coords);
   
   printf("Rank: %2d – MPI Cart created of 2 dims, %2d size\n", rank, size[1] * size[0]);
-  // for debug
+    // for debug
   MPI_Barrier(port);
   srand((unsigned) (time(NULL) + coords[0] + coords[1] + rank));
   int stored_value = (rand() * coords[0] + coords[1]) % 1000 ;
@@ -81,17 +85,17 @@ int main(int argc, char** argv) {
   int switcher = coords[0] * 10 + coords[1];
   
   switch(switcher){
-    
+      
     case 2:
     case 4:
-      // the blue ones
+        // the blue ones
       SET_PAIR_COORDS(coords[0], coords[1] - 1);
       MPI_SEND();
       break;
-    
+      
     case 1:
     case 3:
-      // the red ones
+        // the red ones
       SET_PAIR_COORDS(coords[0], coords[1] + 1);
       MPI_RECEIVE();
       RES_CMP();
@@ -107,11 +111,11 @@ int main(int argc, char** argv) {
     case 32:
     case 33:
     case 34:
-      // the yellow ones
+        // the yellow ones
       SET_PAIR_COORDS(coords[0] + 1, coords[1]);
       MPI_SEND();
       break;
-    
+      
     case 20:
     case 21:
     case 22:
@@ -122,26 +126,26 @@ int main(int argc, char** argv) {
     case 42:
     case 43:
     case 44:
-      // the green ones
+        // the green ones
       SET_PAIR_COORDS(coords[0] - 1, coords[1]);
       MPI_RECEIVE();
       RES_CMP();
       break;
-    
+      
     case 0:
-      // don't touch 0 0 yet
+        // don't touch 0 0 yet
       break;
       
     default:
-      // in case we happen to somehow get here – abort with error
+        // in case we happen to somehow get here – abort with error
       MPI_Abort(port, MPI_ERR_TOPOLOGY);
       break;
   }
   
-  // wait for everyone to exchange their values
+    // wait for everyone to exchange their values
   MPI_Barrier(port);
   
-  // Step 2
+    // Step 2
   
   switch(switcher){
       
@@ -163,23 +167,23 @@ int main(int argc, char** argv) {
     case 22:
     case 23:
     case 24:
-      // the yellow ones
+        // the yellow ones
       SET_PAIR_COORDS(coords[0] + 2, coords[1]);
       MPI_SEND();
       break;
       
-    
+      
     case 40:
     case 41:
     case 42:
     case 43:
     case 44:
-      // the green ones
+        // the green ones
       SET_PAIR_COORDS(coords[0] - 2, coords[1]);
       MPI_RECEIVE();
       RES_CMP();
       break;
-    
+      
     default:
         // all other cases are done, MPI_Topology checked at step 1
       break;
@@ -187,7 +191,7 @@ int main(int argc, char** argv) {
   
   MPI_Barrier(port);
   
-  // Step 3
+    // Step 3
   
   switch(switcher){
       
@@ -227,10 +231,10 @@ int main(int argc, char** argv) {
   
   MPI_Barrier(port);
   
-  // Step 4
+    // Step 4
   
   switch(switcher){
-    
+      
     case 1:
     case 41:
         // the yellow ones
@@ -269,7 +273,7 @@ int main(int argc, char** argv) {
       break;
       
     default:
-      // all other cases are done, MPI_Topology checked at step 1
+        // all other cases are done, MPI_Topology checked at step 1
       break;
   }
   
