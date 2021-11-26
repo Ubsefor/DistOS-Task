@@ -257,6 +257,8 @@ int main(int argc, char** argv) {
   
   MPI_Barrier(port);
   
+    // Step 5
+  
   switch(switcher){
       
     case 40:
