@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
   MPI_Status status = {0};
   
   MPI_Barrier(port);
-  printf("(%d,%d): Init succ, rank: %2d, val: %3d\n", coords[0], coords[1], rank, stored_value);
+  printf("(%d,%d): Init succ, rank: %2d, val: %4d\n", coords[0], coords[1], rank, stored_value);
   
     // Step 1
   MPI_Barrier(port);
@@ -282,7 +282,7 @@ int main(int argc, char** argv) {
   MPI_Barrier(port);
   
   if (coords[0] == 0 && coords[1] == 0){
-    printf("(%d,%d): Received max value equalling to %d\n", coords[0], coords[1], stored_value);
+    printf("(%d,%d): Received max value equalling to %4d\n", coords[0], coords[1], stored_value);
   }
     // Finalize the MPI environment.
   MPI_Finalize();

@@ -45,7 +45,7 @@
       allowLocationSimulation = "YES">
       <PathRunnable
          runnableDebuggingMode = "0"
-         FilePath = "/usr/local/Cellar/open-mpi/4.1.1_2/bin/orterun">
+         FilePath = "/usr/local/bin/mpirun">
       </PathRunnable>
       <MacroExpansion>
          <BuildableReference
@@ -62,15 +62,11 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-mca shmem mmap"
+            argument = "--map-by :OVERSUBSCRIBE"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--use-hwthread-cpus"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--oversubscribe"
+            argument = "--bind-to none"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
@@ -78,13 +74,6 @@
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
-      <EnvironmentVariables>
-         <EnvironmentVariable
-            key = "TMPDIR"
-            value = "/tmp"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
